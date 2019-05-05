@@ -29,5 +29,5 @@ module.exports = {
 
 
 ##iniciar os aplicativos de uma vue
-.base 
+vbase
 
