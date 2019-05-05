@@ -95,57 +95,55 @@ export default {
   },
   methods: {
     jogar(coluna) {
+      let count = 1;
       const elemento = this.$el;
       const thisJogar = this;
 
       if (!this.jogando && this.podeJogar) {
-        var jogadores = ["jogador-amarelo", "imagem-vermelha"];
+        this.jogando = true;
+        let jogador = "jogador-amarelo";
 
-        jogadores.forEach(function(jogador) {
-          coluna = jogador == "imagem-vermelha" ? getRandom(0, 10) : coluna;
-          thisJogar.jogando = true;
-          let count = 1;
-
+        setTimeout(function() {
+          setClass(0, coluna, jogador);
           setTimeout(function() {
-            setClass(0, coluna, jogador);
+            setClass(1, coluna, jogador);
+            setClass(0, coluna, "neutro");
             setTimeout(function() {
-              setClass(1, coluna, jogador);
-              setClass(0, coluna, "neutro");
+              setClass(2, coluna, jogador);
+              setClass(1, coluna, "neutro");
               setTimeout(function() {
-                setClass(2, coluna, jogador);
-                setClass(1, coluna, "neutro");
+                setClass(3, coluna, jogador);
+                setClass(2, coluna, "neutro");
                 setTimeout(function() {
-                  setClass(3, coluna, jogador);
-                  setClass(2, coluna, "neutro");
+                  setClass(4, coluna, jogador);
+                  setClass(3, coluna, "neutro");
                   setTimeout(function() {
-                    setClass(4, coluna, jogador);
-                    setClass(3, coluna, "neutro");
+                    setClass(5, coluna, jogador);
+                    setClass(4, coluna, "neutro");
                     setTimeout(function() {
-                      setClass(5, coluna, jogador);
-                      setClass(4, coluna, "neutro");
-                      setTimeout(function() {
-                        setClass(6, coluna, jogador);
-                        setClass(5, coluna, "neutro");
-                      }, 500);
+                      setClass(6, coluna, jogador);
+                      setClass(5, coluna, "neutro");
                     }, 500);
                   }, 500);
                 }, 500);
               }, 500);
             }, 500);
           }, 500);
-
-          function setClass(linha, coluna, nome) {
-            count++;
-            elemento.children[0].childNodes[linha].childNodes[
-              coluna
-            ].className = nome;
-
-            if (count === 12) {
-              thisJogar.jogando = false;
-            }
-          }
-        });
+        }, 500);
       }
+
+      function setClass(linha, coluna, nome) {
+        count++;
+        elemento.children[0].childNodes[linha].childNodes[
+          coluna
+        ].className = nome;
+
+        if (count === 12) {
+          // Jogar(getRandom(0, 10), "jogador-vermelho");
+          thisJogar.jogando = false;
+        }
+      }
+
       function getRandom(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
