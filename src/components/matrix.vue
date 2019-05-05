@@ -90,7 +90,9 @@ export default {
   },
   data() {
     return {
-      jogando: false
+      jogando: false,
+      casasPrenchidas: [],
+      historico: []
     };
   },
   methods: {
@@ -107,23 +109,29 @@ export default {
           setClass(0, coluna, jogador);
           setTimeout(function() {
             setClass(1, coluna, jogador);
-            setClass(0, coluna, "neutro");
+            if (!verificaSeEstaPreenchida(1, coluna, jogador)) {
+              setClass(0, coluna, "neutro");
+            }
             setTimeout(function() {
               setClass(2, coluna, jogador);
-              setClass(1, coluna, "neutro");
+              if (!verificaSeEstaPreenchida(2, coluna, jogador)) {
+                setClass(1, coluna, "neutro");
+              }
               setTimeout(function() {
                 setClass(3, coluna, jogador);
-                setClass(2, coluna, "neutro");
+                if (!verificaSeEstaPreenchida(3, coluna, jogador)) {
+                  setClass(2, coluna, "neutro");
+                }
                 setTimeout(function() {
                   setClass(4, coluna, jogador);
-                  setClass(3, coluna, "neutro");
+                  if (!verificaSeEstaPreenchida(4, coluna, jogador)) {
+                    setClass(3, coluna, "neutro");
+                  }
                   setTimeout(function() {
                     setClass(5, coluna, jogador);
-                    setClass(4, coluna, "neutro");
-                    setTimeout(function() {
-                      setClass(6, coluna, jogador);
-                      setClass(5, coluna, "neutro");
-                    }, 500);
+                    if (!verificaSeEstaPreenchida(5, coluna, jogador)) {
+                      setClass(4, coluna, "neutro");
+                    }
                   }, 500);
                 }, 500);
               }, 500);
@@ -144,11 +152,40 @@ export default {
         }
       }
 
-      function getRandom(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+      function verificaSeEstaPreenchida(linha, coluna, jogador) {
+        var preenchida = thisJogar.casasPrenchidas.filter(casa => {
+          return casa.linha === linha && casa.coluna === coluna;
+        });
+
+        if (preenchida.length === 0 && linha !== 5) {
+          return false;
+        } else if (preenchida.length === 0 && linha === 5) {
+          thisJogar.casasPrenchidas.push({
+            linha: linha,
+            coluna: coluna,
+            jogador: jogador
+          });
+          return false;
+        } else {
+          thisJogar.casasPrenchidas.push({
+            linha: linha - 1,
+            coluna: coluna,
+            jogador: jogador
+          });
+          thisJogar.jogando = false;
+          return true;
+        }
       }
+
+      // function verificaQuatroSeguidas(){
+
+      // }
+
+      // function getRandom(min, max) {
+      //   min = Math.ceil(min);
+      //   max = Math.floor(max);
+      //   return Math.floor(Math.random() * (max - min + 1)) + min;
+      // }
     }
   },
   watch: {
