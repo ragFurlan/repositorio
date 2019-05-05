@@ -98,52 +98,59 @@ export default {
       casasPrenchidas: [],
       historico: [],
       tempo: 1000,
-      alertando: false
+      alertando: false,
+      jogandoVermelho: false
     };
   },
   methods: {
     jogar(coluna) {
-      let count = 1;
       const elemento = this.$el;
       const thisJogar = this;
+      let count = 1;
+      this.jogandoVermelho = false;
+      jogarPeca(coluna, "jogador-amarelo");
 
-      if (!this.jogando && this.podeJogar) {
-        this.jogando = true;
-        let jogador = "jogador-amarelo";
-
-        setTimeout(function() {
-          setClass(0, coluna, jogador);
+      function jogarPeca(coluna, jogador) {
+        if (
+          (!thisJogar.jogando || thisJogar.jogandoVermelho) &&
+          thisJogar.podeJogar
+        ) {
+          thisJogar.jogando = true;
           setTimeout(function() {
-            setClass(1, coluna, jogador);
-            if (!verificaSeEstaPreenchida(1, coluna, jogador)) {
-              setClass(0, coluna, "neutro");
-            }
+            setClass(0, coluna, jogador);
             setTimeout(function() {
-              setClass(2, coluna, jogador);
-              if (!verificaSeEstaPreenchida(2, coluna, jogador)) {
-                setClass(1, coluna, "neutro");
+              if (!verificaSeEstaPreenchida(1, coluna, jogador)) {
+                setClass(1, coluna, jogador);
+                setClass(0, coluna, "neutro");
               }
               setTimeout(function() {
-                setClass(3, coluna, jogador);
-                if (!verificaSeEstaPreenchida(3, coluna, jogador)) {
-                  setClass(2, coluna, "neutro");
+                if (!verificaSeEstaPreenchida(2, coluna, jogador)) {
+                  setClass(2, coluna, jogador);
+                  setClass(1, coluna, "neutro");
                 }
                 setTimeout(function() {
-                  setClass(4, coluna, jogador);
-                  if (!verificaSeEstaPreenchida(4, coluna, jogador)) {
-                    setClass(3, coluna, "neutro");
+                  setClass(3, coluna, jogador);
+                  if (!verificaSeEstaPreenchida(3, coluna, jogador)) {
+                    setClass(3, coluna, jogador);
+                    setClass(2, coluna, "neutro");
                   }
                   setTimeout(function() {
-                    setClass(5, coluna, jogador);
-                    if (!verificaSeEstaPreenchida(5, coluna, jogador)) {
-                      setClass(4, coluna, "neutro");
+                    if (!verificaSeEstaPreenchida(4, coluna, jogador)) {
+                      setClass(4, coluna, jogador);
+                      setClass(3, coluna, "neutro");
                     }
+                    setTimeout(function() {
+                      if (!verificaSeEstaPreenchida(5, coluna, jogador)) {
+                        setClass(5, coluna, jogador);
+                        setClass(4, coluna, "neutro");
+                      }
+                    }, 400);
                   }, 400);
                 }, 400);
               }, 400);
             }, 400);
           }, 400);
-        }, 400);
+        }
       }
 
       function setClass(linha, coluna, nome) {
@@ -153,7 +160,6 @@ export default {
         ].className = nome;
 
         if (count === 12) {
-          // Jogar(getRandom(0, 10), "jogador-vermelho");
           thisJogar.jogando = false;
         }
       }
@@ -171,6 +177,10 @@ export default {
             coluna: coluna,
             jogador: jogador
           });
+          if (jogador === "jogador-amarelo") {
+            thisJogar.jogandoVermelho = true;
+            jogarPeca(getRandom(0, 10), "jogador-vermelho");
+          }
 
           if (verificaQuatroSeguidas(linha, coluna, jogador)) {
             thisJogar.jogando = false;
@@ -179,7 +189,6 @@ export default {
             setTimeout(function() {
               thisJogar.alertando = false;
             }, 1000);
-            limparSeleções();
           }
         } else {
           thisJogar.casasPrenchidas.push({
@@ -187,7 +196,10 @@ export default {
             coluna: coluna,
             jogador: jogador
           });
-
+          if (jogador === "jogador-amarelo") {
+            thisJogar.jogandoVermelho = true;
+            jogarPeca(getRandom(0, 10), "jogador-vermelho");
+          }
           if (verificaQuatroSeguidas(linha - 1, coluna, jogador)) {
             thisJogar.jogando = false;
             thisJogar.casasPrenchidas = [];
@@ -202,23 +214,20 @@ export default {
         }
       }
 
-      function limparSeleções() {
-        const colunas = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-        const linhas = [0, 1, 2, 3, 4, 5];
+      // function limparSeleções() {
+      //   const colunas = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+      //   const linhas = [0, 1, 2, 3, 4, 5];
 
-        colunas.forEach(function(coluna) {
-          linhas.forEach(function(linha) {
-            setClass(linha, coluna, "neutro");
-          });
-        });
+      //   colunas.forEach(function(coluna) {
+      //     linhas.forEach(function(linha) {
+      //       setClass(linha, coluna, "neutro");
+      //     });
+      //   });
 
-        setClass(0, coluna, "neutro");
-      }
+      //   setClass(0, coluna, "neutro");
+      // }
 
       function verificaQuatroSeguidas(linha, coluna, jogador) {
-        // const colunas = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-        // const linhas = [0, 1, 2, 3, 4, 5];
-
         var preenchidas = thisJogar.casasPrenchidas.filter(casa => {
           return casa.jogador === jogador;
         });
@@ -336,11 +345,11 @@ export default {
         }
       }
 
-      // function getRandom(min, max) {
-      //   min = Math.ceil(min);
-      //   max = Math.floor(max);
-      //   return Math.floor(Math.random() * (max - min + 1)) + min;
-      // }
+      function getRandom(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
     }
   },
   watch: {
