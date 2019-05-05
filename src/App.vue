@@ -1,25 +1,23 @@
 <template>
   <div id="app">
-    <div id="app">
-      <div class="tudo">
-        <div class="titulo">
-          <p>Jogo ForInline</p>
+    <div class="tudo">
+      <div class="titulo">
+        <p>Jogo ForInline</p>
+      </div>
+      <div class="coluna1">
+        <div class="matrix">
+          <matrix :podeJogar="podeJogar"></matrix>
         </div>
-        <div class="coluna1">
-          <div class="matrix">
-            <matrix :podeJogar="podeJogar" jogar="teste"></matrix>
-          </div>
-          <div class="botoes">
-            <botao nomeId="0" @jogar="jogar()"></botao>
-          </div>
+        <div class="botoes">
+          <botao nomeId="0" @jogar="jogar()"></botao>
         </div>
-        <div class="coluna2">
-          <div class="listaAcoes"></div>
-        </div>
-        <div class="coluna3">
-          <div class="dicas"></div>
-          <div class="timeLine"></div>
-        </div>
+      </div>
+      <div class="coluna2">
+        <div class="listaAcoes"></div>
+      </div>
+      <div class="coluna3">
+        <div class="dicas"></div>
+        <div class="timeLine"></div>
       </div>
     </div>
   </div>

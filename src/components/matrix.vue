@@ -1,5 +1,9 @@
 <template>
   <div>
+    <label
+      v-if="alertando"
+      style="index: 100; position: absolute; background: yellow; height: 20px;"
+    >Você ganhou parabéns!!!</label>
     <table class="table">
       <tr>
         <td @click="jogar(0)" ref="A1"></td>
@@ -93,7 +97,8 @@ export default {
       jogando: false,
       casasPrenchidas: [],
       historico: [],
-      tempo: 500
+      tempo: 1000,
+      alertando: false
     };
   },
   methods: {
@@ -133,12 +138,12 @@ export default {
                     if (!verificaSeEstaPreenchida(5, coluna, jogador)) {
                       setClass(4, coluna, "neutro");
                     }
-                  }, this.tempo);
-                }, this.tempo);
-              }, this.tempo);
-            }, this.tempo);
-          }, this.tempo);
-        }, this.tempo);
+                  }, 400);
+                }, 400);
+              }, 400);
+            }, 400);
+          }, 400);
+        }, 400);
       }
 
       function setClass(linha, coluna, nome) {
@@ -168,9 +173,12 @@ export default {
           });
 
           if (verificaQuatroSeguidas(linha, coluna, jogador)) {
-            //retorna mensagem
             thisJogar.jogando = false;
             thisJogar.casasPrenchidas = [];
+            thisJogar.alertando = true;
+            setTimeout(function() {
+              thisJogar.alertando = false;
+            }, 1000);
             limparSeleções();
           }
         } else {
@@ -181,10 +189,12 @@ export default {
           });
 
           if (verificaQuatroSeguidas(linha - 1, coluna, jogador)) {
-            //retorna mensagem
             thisJogar.jogando = false;
             thisJogar.casasPrenchidas = [];
-            limparSeleções();
+            thisJogar.alertando = true;
+            setTimeout(function() {
+              thisJogar.alertando = false;
+            }, 1000);
           }
 
           thisJogar.jogando = false;
