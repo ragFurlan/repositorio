@@ -35,10 +35,8 @@ export default {
     matrix,
     botao
   },
-  data() {
-    return {
-      podeJogar: false
-    };
+  props: {
+    podeJogar: Boolean
   },
   methods: {
     jogar() {
