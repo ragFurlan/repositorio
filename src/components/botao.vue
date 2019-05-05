@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="jogar($event)">GO</button>
+    <button @click="jogar($event)">INICIAR</button>
   </div>
 </template>
 

@@ -1,9 +1,6 @@
 <template>
   <div>
-    <label
-      v-if="alertando"
-      style="index: 100; position: absolute; background: yellow; height: 20px;"
-    >Você ganhou parabéns!!!</label>
+    <label v-if="alertando" class="label-alert">Você ganhou parabéns!!!</label>
     <table class="table">
       <tr>
         <td @click="jogar(0)" ref="A1"></td>
@@ -103,6 +100,9 @@ export default {
     };
   },
   methods: {
+    atualizarHistorico: function(historico) {
+      this.$emit("atualizarHistorico", historico);
+    },
     jogar(coluna) {
       const elemento = this.$el;
       const thisJogar = this;
@@ -191,6 +191,14 @@ export default {
             setTimeout(function() {
               thisJogar.alertando = false;
             }, 1000);
+
+            var jogadorTipo1 =
+              jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
+            var historico1 = "O jogador " + jogadorTipo1 + " ganhou!!";
+            thisJogar.historico.push({
+              historico: historico1
+            });
+            thisJogar.atualizarHistorico({ historico: historico1 });
           }
         } else {
           thisJogar.casasPrenchidas.push({
@@ -206,10 +214,19 @@ export default {
           if (verificaQuatroSeguidas(linha - 1, coluna, jogador)) {
             thisJogar.jogando = false;
             thisJogar.casasPrenchidas = [];
+
             thisJogar.alertando = true;
             setTimeout(function() {
               thisJogar.alertando = false;
             }, 1000);
+
+            var jogadorTipo =
+              jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
+            var historico = "O jogador " + jogadorTipo + " ganhou!!";
+            thisJogar.historico.push({
+              historico: historico
+            });
+            thisJogar.atualizarHistorico({ historico: historico });
           }
 
           thisJogar.jogando = false;
@@ -243,6 +260,7 @@ export default {
         var nome = jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
         var texto = "O jogador " + nome + " encaixou a peça no " + casaJogada;
         thisJogar.historico.push({ historico: texto });
+        thisJogar.atualizarHistorico({ historico: texto });
       }
 
       // function limparSeleções() {
@@ -256,6 +274,8 @@ export default {
       //   });
 
       //   setClass(0, coluna, "neutro");
+      // thisJogar.historico = [];
+      // thisJogar.atualizarHistorico(null);
       // }
 
       function verificaQuatroSeguidas(linha, coluna, jogador) {
@@ -412,5 +432,11 @@ td {
 
 .jogador-vermelho {
   background-image: url("../assets/imagens/centro_vermelho_matrix.png");
+}
+.label-alerta {
+  z-index: 100;
+  position: absolute;
+  background: yellow;
+  height: 20px;
 }
 </style>

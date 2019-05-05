@@ -6,7 +6,7 @@
       </div>
       <div class="coluna1">
         <div class="matrix">
-          <matrix :podeJogar="podeJogar"></matrix>
+          <matrix :podeJogar="podeJogar" @atualizarHistorico="atualizarHistorico"></matrix>
         </div>
         <div class="botoes">
           <botao nomeId="0" @jogar="jogar()"></botao>
@@ -16,8 +16,13 @@
         <div class="listaAcoes"></div>
       </div>
       <div class="coluna3">
-        <div class="dicas"></div>
-        <div class="timeLine">
+        <div class="dicas">
+          <br>
+          <b>1- Objetivo: alinhar 4 jogadas</b>
+          <br>
+          <b>2- Clique no botão iniciar antes de começar o jogo</b>
+        </div>
+        <div class="timeLine scroll-historico">
           <timeLine :listaHistorico="listaHistorico"></timeLine>
         </div>
       </div>
@@ -42,12 +47,24 @@ export default {
   },
   data() {
     return {
-      listaHistorico: [{ historico: "O jogador Amarelo encaixou a peça no A3" }]
+      listaHistorico: []
     };
   },
   methods: {
     jogar() {
       this.podeJogar = !this.podeJogar;
+      if (this.podeJogar) {
+        this.listaHistorico = [{ historico: "Jogo Iniciado" }];
+      } else {
+        this.listaHistorico.push({ historico: "Jogo Terminado" });
+      }
+    },
+    atualizarHistorico(historico) {
+      if (historico == null || historico == undefined) {
+        this.listaHistorico = [];
+      } else {
+        this.listaHistorico.push(historico);
+      }
     }
   }
 };
@@ -134,5 +151,9 @@ export default {
   width: 100%;
   height: 80%;
   margin-top: 10px;
+}
+
+.scroll-historico {
+  overflow: scroll;
 }
 </style>
