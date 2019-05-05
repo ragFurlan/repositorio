@@ -177,6 +177,8 @@ export default {
             coluna: coluna,
             jogador: jogador
           });
+          gravarHistorico(linha, coluna, jogador);
+
           if (jogador === "jogador-amarelo") {
             thisJogar.jogandoVermelho = true;
             jogarPeca(getRandom(0, 10), "jogador-vermelho");
@@ -196,6 +198,7 @@ export default {
             coluna: coluna,
             jogador: jogador
           });
+          gravarHistorico(linha - 1, coluna, jogador);
           if (jogador === "jogador-amarelo") {
             thisJogar.jogandoVermelho = true;
             jogarPeca(getRandom(0, 10), "jogador-vermelho");
@@ -212,6 +215,34 @@ export default {
           thisJogar.jogando = false;
           return true;
         }
+      }
+
+      function gravarHistorico(linha, coluna, jogador) {
+        var casaJogada = linha + 1;
+        switch (coluna) {
+          case 0:
+            casaJogada = "A" + casaJogada.toString();
+            break;
+          case 1:
+            casaJogada = "B" + casaJogada.toString();
+            break;
+          case 2:
+            casaJogada = "C" + casaJogada.toString();
+            break;
+          case 3:
+            casaJogada = "D" + casaJogada.toString();
+            break;
+          case 4:
+            casaJogada = "E" + casaJogada.toString();
+            break;
+          case 5:
+            casaJogada = "F" + casaJogada.toString();
+            break;
+        }
+
+        var nome = jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
+        var texto = "O jogador " + nome + " encaixou a peça no " + casaJogada;
+        thisJogar.historico.push({ historico: texto });
       }
 
       // function limparSeleções() {

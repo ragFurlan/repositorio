@@ -17,7 +17,9 @@
       </div>
       <div class="coluna3">
         <div class="dicas"></div>
-        <div class="timeLine"></div>
+        <div class="timeLine">
+          <timeLine :listaHistorico="listaHistorico"></timeLine>
+        </div>
       </div>
     </div>
   </div>
@@ -26,15 +28,22 @@
 <script>
 import matrix from "./components/matrix.vue";
 import botao from "./components/botao.vue";
+import timeLine from "./components/timeLine.vue";
 
 export default {
   name: "app",
   components: {
     matrix,
-    botao
+    botao,
+    timeLine
   },
   props: {
     podeJogar: Boolean
+  },
+  data() {
+    return {
+      listaHistorico: [{ historico: "O jogador Amarelo encaixou a peça no A3" }]
+    };
   },
   methods: {
     jogar() {
