@@ -1,4 +1,4 @@
-# voe_block_logic
+# vue_for_inline
 
 ## Project setup
 ```
