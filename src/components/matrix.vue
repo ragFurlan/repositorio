@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label v-if="alertando" class="label-alert">Você ganhou parabéns!!!</label>
+    <label v-if="alertando" class="label-alerta">Você ganhou parabéns!!!</label>
     <table class="table">
       <tr>
         <td @click="jogar(0)" ref="A1"></td>
@@ -86,10 +86,13 @@
 
 <script>
 export default {
-  props: ["podeJogar", "limpar"],
+  props: ["podeJogar", "limpar", "parar"],
   watch: {
     limpar: function() {
       this.limparSelecoes();
+    },
+    parar: function(retorno) {
+      this.pararJogada(retorno);
     }
   },
   data() {
@@ -99,7 +102,15 @@ export default {
       historico: [],
       tempo: 1000,
       alertando: false,
-      jogandoVermelho: false
+      jogandoVermelho: false,
+      movendoPeca: false,
+      gravandoPassos: {},
+      timeout: Number,
+      timeout1: Number,
+      timeout2: Number,
+      timeout3: Number,
+      timeout4: Number,
+      timeout5: Number
     };
   },
   methods: {
@@ -121,12 +132,44 @@ export default {
       this.casasPrenchidas = [];
       this.atualizarHistorico(null);
     },
-    jogar(coluna) {
+    pararJogada: function(valor) {
+      if (valor) {
+        this.movendoPeca = true;
+        clearTimeout(this.timeout);
+        clearTimeout(this.timeout1);
+        clearTimeout(this.timeout2);
+        clearTimeout(this.timeout3);
+        clearTimeout(this.timeout4);
+        clearTimeout(this.timeout5);
+
+        this.$el.children[0].childNodes[this.gravandoPassos.linha].childNodes[
+          this.gravandoPassos.coluna
+        ].className = this.gravandoPassos.jogador;
+
+        var jogadorTipo =
+          this.gravandoPassos.jogador === "jogador-amarelo"
+            ? "Amarelo"
+            : "Vermelho";
+        var historico = "O jogador " + jogadorTipo + " parou a jogada!!";
+        this.historico.push({
+          historico: historico
+        });
+        this.atualizarHistorico({ historico: historico });
+      } else {
+        this.jogando = false;
+        this.jogar(this.gravandoPassos.coluna, this.gravandoPassos.jogador);
+      }
+    },
+    jogar: function(coluna, jogador) {
       const elemento = this.$el;
       const thisJogar = this;
       let count = 1;
       this.jogandoVermelho = false;
-      jogarPeca(coluna, "jogador-amarelo");
+      if (jogador) {
+        jogarPeca(coluna, jogador);
+      } else {
+        jogarPeca(coluna, "jogador-amarelo");
+      }
 
       function jogarPeca(coluna, jogador) {
         if (
@@ -134,31 +177,61 @@ export default {
           thisJogar.podeJogar
         ) {
           thisJogar.jogando = true;
-          setTimeout(function() {
+          thisJogar.timeout = setTimeout(function() {
             setClass(0, coluna, jogador);
-            setTimeout(function() {
+            thisJogar.gravandoPassos = {
+              linha: 0,
+              coluna: coluna,
+              jogador: jogador
+            };
+            thisJogar.timeout1 = setTimeout(function() {
               if (!verificaSeEstaPreenchida(1, coluna, jogador)) {
+                thisJogar.gravandoPassos = {
+                  linha: 1,
+                  coluna: coluna,
+                  jogador: jogador
+                };
                 setClass(1, coluna, jogador);
                 setClass(0, coluna, "neutro");
               }
-              setTimeout(function() {
+              thisJogar.timeout2 = setTimeout(function() {
                 if (!verificaSeEstaPreenchida(2, coluna, jogador)) {
+                  thisJogar.gravandoPassos = {
+                    linha: 2,
+                    coluna: coluna,
+                    jogador: jogador
+                  };
                   setClass(2, coluna, jogador);
                   setClass(1, coluna, "neutro");
                 }
-                setTimeout(function() {
+                thisJogar.timeout3 = setTimeout(function() {
                   setClass(3, coluna, jogador);
                   if (!verificaSeEstaPreenchida(3, coluna, jogador)) {
+                    thisJogar.gravandoPassos = {
+                      linha: 3,
+                      coluna: coluna,
+                      jogador: jogador
+                    };
                     setClass(3, coluna, jogador);
                     setClass(2, coluna, "neutro");
                   }
-                  setTimeout(function() {
+                  thisJogar.timeout4 = setTimeout(function() {
                     if (!verificaSeEstaPreenchida(4, coluna, jogador)) {
+                      thisJogar.gravandoPassos = {
+                        linha: 4,
+                        coluna: coluna,
+                        jogador: jogador
+                      };
                       setClass(4, coluna, jogador);
                       setClass(3, coluna, "neutro");
                     }
-                    setTimeout(function() {
+                    thisJogar.timeout5 = setTimeout(function() {
                       if (!verificaSeEstaPreenchida(5, coluna, jogador)) {
+                        thisJogar.gravandoPassos = {
+                          linha: 5,
+                          coluna: coluna,
+                          jogador: jogador
+                        };
                         setClass(5, coluna, jogador);
                         setClass(4, coluna, "neutro");
                       }

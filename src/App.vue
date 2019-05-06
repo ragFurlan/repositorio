@@ -6,7 +6,12 @@
       </div>
       <div class="coluna1">
         <div class="matrix">
-          <matrix :podeJogar="podeJogar" @atualizarHistorico="atualizarHistorico" :limpar="limpar"></matrix>
+          <matrix
+            :podeJogar="podeJogar"
+            @atualizarHistorico="atualizarHistorico"
+            :limpar="limpar"
+            :parar="parando"
+          ></matrix>
         </div>
         <div class="botoes">
           <botao :nome-botao="nomeBotao" @click="jogar()"></botao>
@@ -14,7 +19,11 @@
         </div>
       </div>
       <div class="coluna2">
-        <div class="listaAcoes"></div>
+        <div class="listaAcoes">
+          <botao :nome-botao="nomeBotaoParar" @click="parar()"></botao>
+          <botao-direcao direcao="esquerda" :nome-botao="esquerda" @click="parar()"></botao-direcao>
+          <botao-direcao direcao="direita" :nome-botao="direita" @click="parar()"></botao-direcao>
+        </div>
       </div>
       <div class="coluna3">
         <div class="dicas">
@@ -35,22 +44,28 @@
 import matrix from "./components/matrix.vue";
 import botao from "./components/botao.vue";
 import timeLine from "./components/timeLine.vue";
+import botaoDirecao from "./components/botaoDirecao.vue";
 
 export default {
   name: "app",
   components: {
     matrix,
     botao,
-    timeLine
+    timeLine,
+    botaoDirecao
   },
   props: {
     podeJogar: Boolean,
-    limpar: Boolean
+    limpar: Boolean,
+    parando: Boolean
   },
   data() {
     return {
       listaHistorico: [],
-      nomeBotao: "INICIAR"
+      nomeBotao: "INICIAR",
+      nomeBotaoParar: "PARAR",
+      esquerda: "<= ESQUERDA",
+      direita: "DIREITA =>"
     };
   },
   methods: {
@@ -73,6 +88,15 @@ export default {
     },
     limparJogo() {
       this.limpar += "A";
+    },
+    parar() {
+      this.parando = !this.parando;
+
+      if (this.parando) {
+        this.nomeBotaoParar = "CONTINUAR";
+      } else {
+        this.nomeBotaoParar = "PARAR";
+      }
     }
   }
 };
