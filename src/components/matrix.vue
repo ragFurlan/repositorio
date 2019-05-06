@@ -86,13 +86,19 @@
 
 <script>
 export default {
-  props: ["podeJogar", "limpar", "parar"],
+  props: ["podeJogar", "limpar", "parar", "moverEsquerda", "moverDireita"],
   watch: {
     limpar: function() {
       this.limparSelecoes();
     },
     parar: function(retorno) {
       this.pararJogada(retorno);
+    },
+    moverEsquerda: function() {
+      this.mover("esquerda");
+    },
+    moverDireita: function() {
+      this.mover("direita");
     }
   },
   data() {
@@ -113,7 +119,48 @@ export default {
       timeout5: Number
     };
   },
+
   methods: {
+    mover: function(direcao) {
+      const thisJogar = this;
+      if (this.movendoPeca) {
+        var linha = this.gravandoPassos.linha;
+        var coluna =
+          direcao === "esquerda"
+            ? this.gravandoPassos.coluna - 1
+            : this.gravandoPassos.coluna + 1;
+        var jogador = this.gravandoPassos.jogador;
+
+        setTimeout(function() {
+          if (!thisJogar.verificaSeEstaPreenchida(linha, coluna, jogador)) {
+            thisJogar.$el.children[0].childNodes[linha].childNodes[
+              coluna
+            ].className = jogador;
+
+            thisJogar.$el.children[0].childNodes[linha].childNodes[
+              thisJogar.gravandoPassos.coluna
+            ].className = "neutro";
+
+            thisJogar.gravandoPassos = {
+              linha: linha,
+              coluna: coluna,
+              jogador: jogador
+            };
+
+            var jogadorTipo =
+              thisJogar.gravandoPassos.jogador === "jogador-amarelo"
+                ? "Amarelo"
+                : "Vermelho";
+            var historico =
+              "O jogador " + jogadorTipo + " foi para a " + direcao + "!!";
+            thisJogar.historico.push({
+              historico: historico
+            });
+            thisJogar.atualizarHistorico({ historico: historico });
+          }
+        }, 300);
+      }
+    },
     atualizarHistorico: function(historico) {
       this.$emit("atualizarHistorico", historico);
     },
@@ -156,327 +203,326 @@ export default {
         });
         this.atualizarHistorico({ historico: historico });
       } else {
+        this.movendoPeca = false;
         this.jogando = false;
         this.jogar(this.gravandoPassos.coluna, this.gravandoPassos.jogador);
       }
     },
     jogar: function(coluna, jogador) {
-      const elemento = this.$el;
-      const thisJogar = this;
       let count = 1;
       this.jogandoVermelho = false;
       if (jogador) {
-        jogarPeca(coluna, jogador);
+        this.jogarPeca(coluna, jogador, count);
       } else {
-        jogarPeca(coluna, "jogador-amarelo");
+        this.jogarPeca(coluna, "jogador-amarelo", count);
       }
-
-      function jogarPeca(coluna, jogador) {
-        if (
-          (!thisJogar.jogando || thisJogar.jogandoVermelho) &&
-          thisJogar.podeJogar
-        ) {
-          thisJogar.jogando = true;
-          thisJogar.timeout = setTimeout(function() {
-            setClass(0, coluna, jogador);
-            thisJogar.gravandoPassos = {
-              linha: 0,
-              coluna: coluna,
-              jogador: jogador
-            };
-            thisJogar.timeout1 = setTimeout(function() {
-              if (!verificaSeEstaPreenchida(1, coluna, jogador)) {
+    },
+    jogarPeca: function(coluna, jogador, count) {
+      const thisJogar = this;
+      if (
+        (!thisJogar.jogando || thisJogar.jogandoVermelho) &&
+        thisJogar.podeJogar
+      ) {
+        thisJogar.jogando = true;
+        thisJogar.timeout = setTimeout(function() {
+          thisJogar.setClass(0, coluna, jogador, count);
+          thisJogar.gravandoPassos = {
+            linha: 0,
+            coluna: coluna,
+            jogador: jogador
+          };
+          thisJogar.timeout1 = setTimeout(function() {
+            if (!thisJogar.verificaSeEstaPreenchida(1, coluna, jogador)) {
+              thisJogar.gravandoPassos = {
+                linha: 1,
+                coluna: coluna,
+                jogador: jogador
+              };
+              thisJogar.setClass(1, coluna, jogador, count);
+              thisJogar.setClass(0, coluna, "neutro", count);
+            }
+            thisJogar.timeout2 = setTimeout(function() {
+              if (!thisJogar.verificaSeEstaPreenchida(2, coluna, jogador)) {
                 thisJogar.gravandoPassos = {
-                  linha: 1,
+                  linha: 2,
                   coluna: coluna,
                   jogador: jogador
                 };
-                setClass(1, coluna, jogador);
-                setClass(0, coluna, "neutro");
+                thisJogar.setClass(2, coluna, jogador, count);
+                thisJogar.setClass(1, coluna, "neutro", count);
               }
-              thisJogar.timeout2 = setTimeout(function() {
-                if (!verificaSeEstaPreenchida(2, coluna, jogador)) {
+              thisJogar.timeout3 = setTimeout(function() {
+                thisJogar.setClass(3, coluna, jogador, count);
+                if (!thisJogar.verificaSeEstaPreenchida(3, coluna, jogador)) {
                   thisJogar.gravandoPassos = {
-                    linha: 2,
+                    linha: 3,
                     coluna: coluna,
                     jogador: jogador
                   };
-                  setClass(2, coluna, jogador);
-                  setClass(1, coluna, "neutro");
+                  thisJogar.setClass(3, coluna, jogador, count);
+                  thisJogar.setClass(2, coluna, "neutro", count);
                 }
-                thisJogar.timeout3 = setTimeout(function() {
-                  setClass(3, coluna, jogador);
-                  if (!verificaSeEstaPreenchida(3, coluna, jogador)) {
+                thisJogar.timeout4 = setTimeout(function() {
+                  if (!thisJogar.verificaSeEstaPreenchida(4, coluna, jogador)) {
                     thisJogar.gravandoPassos = {
-                      linha: 3,
+                      linha: 4,
                       coluna: coluna,
                       jogador: jogador
                     };
-                    setClass(3, coluna, jogador);
-                    setClass(2, coluna, "neutro");
+                    thisJogar.setClass(4, coluna, jogador, count);
+                    thisJogar.setClass(3, coluna, "neutro", count);
                   }
-                  thisJogar.timeout4 = setTimeout(function() {
-                    if (!verificaSeEstaPreenchida(4, coluna, jogador)) {
+                  thisJogar.timeout5 = setTimeout(function() {
+                    if (
+                      !thisJogar.verificaSeEstaPreenchida(5, coluna, jogador)
+                    ) {
                       thisJogar.gravandoPassos = {
-                        linha: 4,
+                        linha: 5,
                         coluna: coluna,
                         jogador: jogador
                       };
-                      setClass(4, coluna, jogador);
-                      setClass(3, coluna, "neutro");
+                      thisJogar.setClass(5, coluna, jogador, count);
+                      thisJogar.setClass(4, coluna, "neutro", count);
                     }
-                    thisJogar.timeout5 = setTimeout(function() {
-                      if (!verificaSeEstaPreenchida(5, coluna, jogador)) {
-                        thisJogar.gravandoPassos = {
-                          linha: 5,
-                          coluna: coluna,
-                          jogador: jogador
-                        };
-                        setClass(5, coluna, jogador);
-                        setClass(4, coluna, "neutro");
-                      }
-                    }, 300);
                   }, 300);
                 }, 300);
               }, 300);
             }, 300);
           }, 300);
-        }
+        }, 300);
       }
+    },
+    setClass: function(linha, coluna, nome, count) {
+      const elemento = this.$el;
+      count++;
+      elemento.children[0].childNodes[linha].childNodes[
+        coluna
+      ].className = nome;
 
-      function setClass(linha, coluna, nome) {
-        count++;
-        elemento.children[0].childNodes[linha].childNodes[
-          coluna
-        ].className = nome;
-
-        if (count === 12) {
-          thisJogar.jogando = false;
-        }
+      if (count === 12) {
+        this.jogando = false;
       }
+    },
+    verificaSeEstaPreenchida: function(linha, coluna, jogador) {
+      const thisJogar = this;
+      var preenchida = thisJogar.casasPrenchidas.filter(casa => {
+        return casa.linha === linha && casa.coluna === coluna;
+      });
 
-      function verificaSeEstaPreenchida(linha, coluna, jogador) {
-        var preenchida = thisJogar.casasPrenchidas.filter(casa => {
-          return casa.linha === linha && casa.coluna === coluna;
+      if (preenchida.length === 0 && linha !== 5) {
+        return false;
+      } else if (preenchida.length === 0 && linha === 5) {
+        thisJogar.casasPrenchidas.push({
+          linha: linha,
+          coluna: coluna,
+          jogador: jogador
         });
+        thisJogar.gravarHistorico(linha, coluna, jogador);
 
-        if (preenchida.length === 0 && linha !== 5) {
-          return false;
-        } else if (preenchida.length === 0 && linha === 5) {
-          thisJogar.casasPrenchidas.push({
-            linha: linha,
-            coluna: coluna,
-            jogador: jogador
-          });
-          gravarHistorico(linha, coluna, jogador);
+        if (jogador === "jogador-amarelo") {
+          thisJogar.jogandoVermelho = true;
+          thisJogar.jogarPeca(thisJogar.getRandom(0, 10), "jogador-vermelho");
+        }
 
-          if (jogador === "jogador-amarelo") {
-            thisJogar.jogandoVermelho = true;
-            jogarPeca(getRandom(0, 10), "jogador-vermelho");
-          }
-
-          if (verificaQuatroSeguidas(linha, coluna, jogador)) {
-            thisJogar.jogando = false;
-            thisJogar.casasPrenchidas = [];
-            thisJogar.alertando = true;
-            setTimeout(function() {
-              thisJogar.alertando = false;
-            }, 1000);
-
-            var jogadorTipo1 =
-              jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
-            var historico1 = "O jogador " + jogadorTipo1 + " ganhou!!";
-            thisJogar.historico.push({
-              historico: historico1
-            });
-            thisJogar.atualizarHistorico({ historico: historico1 });
-          }
-        } else {
-          thisJogar.casasPrenchidas.push({
-            linha: linha - 1,
-            coluna: coluna,
-            jogador: jogador
-          });
-          gravarHistorico(linha - 1, coluna, jogador);
-          if (jogador === "jogador-amarelo") {
-            thisJogar.jogandoVermelho = true;
-            jogarPeca(getRandom(0, 10), "jogador-vermelho");
-          }
-          if (verificaQuatroSeguidas(linha - 1, coluna, jogador)) {
-            thisJogar.jogando = false;
-            thisJogar.casasPrenchidas = [];
-
-            thisJogar.alertando = true;
-            setTimeout(function() {
-              thisJogar.alertando = false;
-            }, 1000);
-
-            var jogadorTipo =
-              jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
-            var historico = "O jogador " + jogadorTipo + " ganhou!!";
-            thisJogar.historico.push({
-              historico: historico
-            });
-            thisJogar.atualizarHistorico({ historico: historico });
-          }
-
+        if (thisJogar.verificaQuatroSeguidas(linha, coluna, jogador)) {
           thisJogar.jogando = false;
-          return true;
-        }
-      }
+          thisJogar.casasPrenchidas = [];
+          thisJogar.alertando = true;
+          setTimeout(function() {
+            thisJogar.alertando = false;
+          }, 1000);
 
-      function gravarHistorico(linha, coluna, jogador) {
-        var casaJogada = linha + 1;
-        switch (coluna) {
-          case 0:
-            casaJogada = "A" + casaJogada.toString();
-            break;
-          case 1:
-            casaJogada = "B" + casaJogada.toString();
-            break;
-          case 2:
-            casaJogada = "C" + casaJogada.toString();
-            break;
-          case 3:
-            casaJogada = "D" + casaJogada.toString();
-            break;
-          case 4:
-            casaJogada = "E" + casaJogada.toString();
-            break;
-          case 5:
-            casaJogada = "F" + casaJogada.toString();
-            break;
-        }
-
-        var nome = jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
-        var texto = "O jogador " + nome + " encaixou a peça no " + casaJogada;
-        thisJogar.historico.push({ historico: texto });
-        thisJogar.atualizarHistorico({ historico: texto });
-      }
-
-      function verificaQuatroSeguidas(linha, coluna, jogador) {
-        var preenchidas = thisJogar.casasPrenchidas.filter(casa => {
-          return casa.jogador === jogador;
-        });
-
-        if (preenchidas.length < 4) {
-          return false;
-        } else {
-          const colunaEsquerda = [coluna - 1, coluna - 2, coluna - 3];
-          const colunaDireita = [coluna + 1, coluna + 2, coluna + 3];
-          const colunaIntermediaria1 = [coluna - 1, coluna + 1, coluna + 2];
-          const colunaIntermediaria2 = [coluna - 1, coluna - 2, coluna + 1];
-
-          const linhaAcima = [linha - 1, linha - 2, linha - 3];
-          const linhaAbaixo = [linha + 1, linha + 2, linha + 3];
-          const linhaIntermediaria3 = [linha - 1, linha + 1, linha + 2];
-          const linhaIntermediaria4 = [linha - 1, linha - 2, linha + 1];
-
-          let esquerda = 0;
-          let direita = 0;
-          let inter1 = 0;
-          let inter2 = 0;
-          let inter3 = 0;
-          let inter4 = 0;
-          let acima = 0;
-          let abaixo = 0;
-
-          preenchidas.forEach(function(item) {
-            if (
-              item.linha == linha &&
-              (item.coluna === colunaEsquerda[0] ||
-                item.coluna === colunaEsquerda[1] ||
-                item.coluna === colunaEsquerda[2])
-            ) {
-              esquerda++;
-            }
-
-            if (
-              item.linha == linha &&
-              (item.coluna === colunaDireita[0] ||
-                item.coluna === colunaDireita[1] ||
-                item.coluna === colunaDireita[2])
-            ) {
-              direita++;
-            }
-
-            if (
-              item.linha == linha &&
-              (item.coluna === colunaIntermediaria1[0] ||
-                item.coluna === colunaIntermediaria1[1] ||
-                item.coluna === colunaIntermediaria1[2])
-            ) {
-              inter1++;
-            }
-
-            if (
-              item.linha == linha &&
-              (item.coluna === colunaIntermediaria2[0] ||
-                item.coluna === colunaIntermediaria2[1] ||
-                item.coluna === colunaIntermediaria2[2])
-            ) {
-              inter2++;
-            }
-
-            if (
-              item.coluna == coluna &&
-              (item.linha === linhaAcima[0] ||
-                item.linha === linhaAcima[1] ||
-                item.linha === linhaAcima[2])
-            ) {
-              acima++;
-            }
-
-            if (
-              item.coluna == coluna &&
-              (item.linha === linhaAbaixo[0] ||
-                item.linha === linhaAbaixo[1] ||
-                item.linha === linhaAbaixo[2])
-            ) {
-              abaixo++;
-            }
-
-            if (
-              item.coluna == coluna &&
-              (item.linha === linhaIntermediaria3[0] ||
-                item.linha === linhaIntermediaria3[1] ||
-                item.linha === linhaIntermediaria3[2])
-            ) {
-              inter3++;
-            }
-
-            if (
-              item.coluna == coluna &&
-              (item.linha === linhaIntermediaria4[0] ||
-                item.linha === linhaIntermediaria4[1] ||
-                item.linha === linhaIntermediaria4[2])
-            ) {
-              inter4++;
-            }
+          var jogadorTipo1 =
+            jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
+          var historico1 = "O jogador " + jogadorTipo1 + " ganhou!!";
+          thisJogar.historico.push({
+            historico: historico1
           });
+          thisJogar.atualizarHistorico({ historico: historico1 });
+        }
+      } else {
+        thisJogar.casasPrenchidas.push({
+          linha: linha - 1,
+          coluna: coluna,
+          jogador: jogador
+        });
+        thisJogar.gravarHistorico(linha - 1, coluna, jogador);
+        if (jogador === "jogador-amarelo") {
+          thisJogar.jogandoVermelho = true;
+          thisJogar.jogarPeca(thisJogar.getRandom(0, 10), "jogador-vermelho");
+        }
+        if (thisJogar.verificaQuatroSeguidas(linha - 1, coluna, jogador)) {
+          thisJogar.jogando = false;
+          thisJogar.casasPrenchidas = [];
+
+          thisJogar.alertando = true;
+          setTimeout(function() {
+            thisJogar.alertando = false;
+          }, 1000);
+
+          var jogadorTipo =
+            jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
+          var historico = "O jogador " + jogadorTipo + " ganhou!!";
+          thisJogar.historico.push({
+            historico: historico
+          });
+          thisJogar.atualizarHistorico({ historico: historico });
+        }
+
+        thisJogar.jogando = false;
+        return true;
+      }
+    },
+    gravarHistorico: function(linha, coluna, jogador) {
+      const thisJogar = this;
+      var casaJogada = linha + 1;
+      switch (coluna) {
+        case 0:
+          casaJogada = "A" + casaJogada.toString();
+          break;
+        case 1:
+          casaJogada = "B" + casaJogada.toString();
+          break;
+        case 2:
+          casaJogada = "C" + casaJogada.toString();
+          break;
+        case 3:
+          casaJogada = "D" + casaJogada.toString();
+          break;
+        case 4:
+          casaJogada = "E" + casaJogada.toString();
+          break;
+        case 5:
+          casaJogada = "F" + casaJogada.toString();
+          break;
+      }
+
+      var nome = jogador === "jogador-amarelo" ? "Amarelo" : "Vermelho";
+      var texto = "O jogador " + nome + " encaixou a peça no " + casaJogada;
+      thisJogar.historico.push({ historico: texto });
+      thisJogar.atualizarHistorico({ historico: texto });
+    },
+    verificaQuatroSeguidas: function(linha, coluna, jogador) {
+      var preenchidas = this.casasPrenchidas.filter(casa => {
+        return casa.jogador === jogador;
+      });
+
+      if (preenchidas.length < 4) {
+        return false;
+      } else {
+        const colunaEsquerda = [coluna - 1, coluna - 2, coluna - 3];
+        const colunaDireita = [coluna + 1, coluna + 2, coluna + 3];
+        const colunaIntermediaria1 = [coluna - 1, coluna + 1, coluna + 2];
+        const colunaIntermediaria2 = [coluna - 1, coluna - 2, coluna + 1];
+
+        const linhaAcima = [linha - 1, linha - 2, linha - 3];
+        const linhaAbaixo = [linha + 1, linha + 2, linha + 3];
+        const linhaIntermediaria3 = [linha - 1, linha + 1, linha + 2];
+        const linhaIntermediaria4 = [linha - 1, linha - 2, linha + 1];
+
+        let esquerda = 0;
+        let direita = 0;
+        let inter1 = 0;
+        let inter2 = 0;
+        let inter3 = 0;
+        let inter4 = 0;
+        let acima = 0;
+        let abaixo = 0;
+
+        preenchidas.forEach(function(item) {
+          if (
+            item.linha == linha &&
+            (item.coluna === colunaEsquerda[0] ||
+              item.coluna === colunaEsquerda[1] ||
+              item.coluna === colunaEsquerda[2])
+          ) {
+            esquerda++;
+          }
 
           if (
-            esquerda > 2 ||
-            direita > 2 ||
-            inter1 > 2 ||
-            inter2 > 2 ||
-            inter3 > 2 ||
-            inter4 > 2 ||
-            acima > 2 ||
-            abaixo > 2
+            item.linha == linha &&
+            (item.coluna === colunaDireita[0] ||
+              item.coluna === colunaDireita[1] ||
+              item.coluna === colunaDireita[2])
           ) {
-            return true;
-          } else {
-            return false;
+            direita++;
           }
+
+          if (
+            item.linha == linha &&
+            (item.coluna === colunaIntermediaria1[0] ||
+              item.coluna === colunaIntermediaria1[1] ||
+              item.coluna === colunaIntermediaria1[2])
+          ) {
+            inter1++;
+          }
+
+          if (
+            item.linha == linha &&
+            (item.coluna === colunaIntermediaria2[0] ||
+              item.coluna === colunaIntermediaria2[1] ||
+              item.coluna === colunaIntermediaria2[2])
+          ) {
+            inter2++;
+          }
+
+          if (
+            item.coluna == coluna &&
+            (item.linha === linhaAcima[0] ||
+              item.linha === linhaAcima[1] ||
+              item.linha === linhaAcima[2])
+          ) {
+            acima++;
+          }
+
+          if (
+            item.coluna == coluna &&
+            (item.linha === linhaAbaixo[0] ||
+              item.linha === linhaAbaixo[1] ||
+              item.linha === linhaAbaixo[2])
+          ) {
+            abaixo++;
+          }
+
+          if (
+            item.coluna == coluna &&
+            (item.linha === linhaIntermediaria3[0] ||
+              item.linha === linhaIntermediaria3[1] ||
+              item.linha === linhaIntermediaria3[2])
+          ) {
+            inter3++;
+          }
+
+          if (
+            item.coluna == coluna &&
+            (item.linha === linhaIntermediaria4[0] ||
+              item.linha === linhaIntermediaria4[1] ||
+              item.linha === linhaIntermediaria4[2])
+          ) {
+            inter4++;
+          }
+        });
+
+        if (
+          esquerda > 2 ||
+          direita > 2 ||
+          inter1 > 2 ||
+          inter2 > 2 ||
+          inter3 > 2 ||
+          inter4 > 2 ||
+          acima > 2 ||
+          abaixo > 2
+        ) {
+          return true;
+        } else {
+          return false;
         }
       }
-
-      function getRandom(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
+    },
+    getRandom: function(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
   }
 };

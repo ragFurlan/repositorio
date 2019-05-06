@@ -11,6 +11,8 @@
             @atualizarHistorico="atualizarHistorico"
             :limpar="limpar"
             :parar="parando"
+            :moverEsquerda="moverEsquerda"
+            :moverDireita="moverDireita"
           ></matrix>
         </div>
         <div class="botoes">
@@ -21,8 +23,8 @@
       <div class="coluna2">
         <div class="listaAcoes">
           <botao :nome-botao="nomeBotaoParar" @click="parar()"></botao>
-          <botao-direcao direcao="esquerda" :nome-botao="esquerda" @click="parar()"></botao-direcao>
-          <botao-direcao direcao="direita" :nome-botao="direita" @click="parar()"></botao-direcao>
+          <botao-direcao direcao="esquerda" :nome-botao="esquerda" @click="mover"></botao-direcao>
+          <botao-direcao direcao="direita" :nome-botao="direita" @click="mover"></botao-direcao>
         </div>
       </div>
       <div class="coluna3">
@@ -31,6 +33,8 @@
           <b>1- Objetivo: alinhar 4 jogadas</b>
           <br>
           <b>2- Clique no botão iniciar antes de começar o jogo</b>
+          <br>
+          <b>3- Caso queira mudar o curso da jogada. Clica em parar e depois para esquerda e direira, após posicionar é só clicar em continuar</b>
         </div>
         <div class="timeLine scroll-historico">
           <timeLine :listaHistorico="listaHistorico"></timeLine>
@@ -57,7 +61,9 @@ export default {
   props: {
     podeJogar: Boolean,
     limpar: Boolean,
-    parando: Boolean
+    parando: Boolean,
+    moverEsquerda: String,
+    moverDireita: String
   },
   data() {
     return {
@@ -96,6 +102,13 @@ export default {
         this.nomeBotaoParar = "CONTINUAR";
       } else {
         this.nomeBotaoParar = "PARAR";
+      }
+    },
+    mover(direcao) {
+      if (direcao == "esquerda") {
+        this.moverEsquerda += "1";
+      } else {
+        this.moverDireita += "1";
       }
     }
   }
