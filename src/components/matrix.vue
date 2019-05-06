@@ -86,8 +86,11 @@
 
 <script>
 export default {
-  props: {
-    podeJogar: Boolean
+  props: ["podeJogar", "limpar"],
+  watch: {
+    limpar: function() {
+      this.limparSelecoes();
+    }
   },
   data() {
     return {
@@ -102,6 +105,21 @@ export default {
   methods: {
     atualizarHistorico: function(historico) {
       this.$emit("atualizarHistorico", historico);
+    },
+    limparSelecoes: function() {
+      const colunas = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      const linhas = [0, 1, 2, 3, 4, 5];
+      const elemento = this.$el;
+
+      colunas.forEach(function(coluna) {
+        linhas.forEach(function(linha) {
+          elemento.children[0].childNodes[linha].childNodes[coluna].className =
+            "neutro";
+        });
+      });
+
+      this.casasPrenchidas = [];
+      this.atualizarHistorico(null);
     },
     jogar(coluna) {
       const elemento = this.$el;
@@ -144,12 +162,12 @@ export default {
                         setClass(5, coluna, jogador);
                         setClass(4, coluna, "neutro");
                       }
-                    }, 400);
-                  }, 400);
-                }, 400);
-              }, 400);
-            }, 400);
-          }, 400);
+                    }, 300);
+                  }, 300);
+                }, 300);
+              }, 300);
+            }, 300);
+          }, 300);
         }
       }
 
@@ -262,21 +280,6 @@ export default {
         thisJogar.historico.push({ historico: texto });
         thisJogar.atualizarHistorico({ historico: texto });
       }
-
-      // function limparSeleções() {
-      //   const colunas = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-      //   const linhas = [0, 1, 2, 3, 4, 5];
-
-      //   colunas.forEach(function(coluna) {
-      //     linhas.forEach(function(linha) {
-      //       setClass(linha, coluna, "neutro");
-      //     });
-      //   });
-
-      //   setClass(0, coluna, "neutro");
-      // thisJogar.historico = [];
-      // thisJogar.atualizarHistorico(null);
-      // }
 
       function verificaQuatroSeguidas(linha, coluna, jogador) {
         var preenchidas = thisJogar.casasPrenchidas.filter(casa => {
@@ -402,10 +405,6 @@ export default {
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
     }
-  },
-  watch: {
-    isChange: function() {},
-    methods: {}
   }
 };
 </script>

@@ -6,10 +6,11 @@
       </div>
       <div class="coluna1">
         <div class="matrix">
-          <matrix :podeJogar="podeJogar" @atualizarHistorico="atualizarHistorico"></matrix>
+          <matrix :podeJogar="podeJogar" @atualizarHistorico="atualizarHistorico" :limpar="limpar"></matrix>
         </div>
         <div class="botoes">
-          <botao nomeId="0" @jogar="jogar()"></botao>
+          <botao :nome-botao="nomeBotao" @click="jogar()"></botao>
+          <botao nome-botao="LIMPAR" @click="limparJogo()"></botao>
         </div>
       </div>
       <div class="coluna2">
@@ -43,20 +44,24 @@ export default {
     timeLine
   },
   props: {
-    podeJogar: Boolean
+    podeJogar: Boolean,
+    limpar: Boolean
   },
   data() {
     return {
-      listaHistorico: []
+      listaHistorico: [],
+      nomeBotao: "INICIAR"
     };
   },
   methods: {
     jogar() {
       this.podeJogar = !this.podeJogar;
       if (this.podeJogar) {
-        this.listaHistorico = [{ historico: "Jogo Iniciado" }];
+        this.listaHistorico.push({ historico: "Jogo Iniciado" });
+        this.nomeBotao = "BLOQUEAR";
       } else {
         this.listaHistorico.push({ historico: "Jogo Terminado" });
+        this.nomeBotao = "INICIAR";
       }
     },
     atualizarHistorico(historico) {
@@ -65,6 +70,9 @@ export default {
       } else {
         this.listaHistorico.push(historico);
       }
+    },
+    limparJogo() {
+      this.limpar += "A";
     }
   }
 };

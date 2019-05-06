@@ -1,15 +1,16 @@
 <template>
   <div>
-    <button @click="jogar($event)">INICIAR</button>
+    <button @click="click($event)">{{nomeBotao}}</button>
   </div>
 </template>
 
 <script>
 export default {
+  props: ["nomeBotao"],
   methods: {
-    jogar() {
+    click() {
       event.preventDefault();
-      this.$emit("jogar");
+      this.$emit("click");
     }
   }
 };
