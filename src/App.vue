@@ -11,32 +11,39 @@
             @atualizarHistorico="atualizarHistorico"
             :limpar="limpar"
             :parar="parando"
+            :continuar="continuando"
             :moverEsquerda="moverEsquerda"
             :moverDireita="moverDireita"
           ></matrix>
         </div>
         <div class="botoes">
-          <botao :nome-botao="nomeBotao" @click="jogar()"></botao>
-          <botao nome-botao="LIMPAR" @click="limparJogo()"></botao>
+          <div>
+            <botao :nome-botao="nomeBotao" @click="jogar()"></botao>
+          </div>
+          <div>
+            <botao nome-botao="LIMPAR" @click="limparJogo()"></botao>
+          </div>
         </div>
       </div>
       <div class="coluna2">
         <div class="listaAcoes">
-          <botao :nome-botao="nomeBotaoParar" @click="parar()"></botao>
+          <botao nome-botao="PARAR" @click="parar()"></botao>
+          <botao nome-botao="CONTINUAR" @click="continuar()"></botao>
           <botao-direcao direcao="esquerda" :nome-botao="esquerda" @click="mover"></botao-direcao>
           <botao-direcao direcao="direita" :nome-botao="direita" @click="mover"></botao-direcao>
         </div>
       </div>
       <div class="coluna3">
-        <div class="dicas">
-          <br>
+        <div class="dicas scroll">
           <b>1- Objetivo: alinhar 4 jogadas</b>
           <br>
-          <b>2- Clique no botão iniciar antes de começar o jogo</b>
+          <b>2- Para jogar clique na coluna</b>
           <br>
-          <b>3- Caso queira mudar o curso da jogada. Clica em parar e depois para esquerda e direira, após posicionar é só clicar em continuar</b>
+          <b>3- Clique no botão iniciar antes de começar o jogo</b>
+          <br>
+          <b>4- Caso queira mudar o curso da jogada. Clica em parar e depois para esquerda e direira, após posicionar é só clicar em continuar</b>
         </div>
-        <div class="timeLine scroll-historico">
+        <div class="timeLine scroll">
           <timeLine :listaHistorico="listaHistorico"></timeLine>
         </div>
       </div>
@@ -63,7 +70,8 @@ export default {
     limpar: Boolean,
     parando: Boolean,
     moverEsquerda: String,
-    moverDireita: String
+    moverDireita: String,
+    continuando: String
   },
   data() {
     return {
@@ -96,13 +104,10 @@ export default {
       this.limpar += "A";
     },
     parar() {
-      this.parando = !this.parando;
-
-      if (this.parando) {
-        this.nomeBotaoParar = "CONTINUAR";
-      } else {
-        this.nomeBotaoParar = "PARAR";
-      }
+      this.parando += "A";
+    },
+    continuar() {
+      this.continuando += "A";
     },
     mover(direcao) {
       if (direcao == "esquerda") {
@@ -198,7 +203,7 @@ export default {
   margin-top: 10px;
 }
 
-.scroll-historico {
+.scroll {
   overflow: scroll;
 }
 </style>

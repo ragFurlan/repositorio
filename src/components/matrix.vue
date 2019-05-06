@@ -1,6 +1,7 @@
 <template>
   <div>
-    <label v-if="alertando" class="label-alerta">Você ganhou parabéns!!!</label>
+    <label v-if="alertandoVermelho" class="label-alerta">Jogador Amarelo ganhou parabéns!!!</label>
+    <label v-if="alertandoAmarelo" class="label-alerta">Jogador Vermelho ganhou parabéns!!!</label>
     <table class="table">
       <tr>
         <td @click="jogar(0)" ref="A1"></td>
@@ -86,13 +87,23 @@
 
 <script>
 export default {
-  props: ["podeJogar", "limpar", "parar", "moverEsquerda", "moverDireita"],
+  props: [
+    "podeJogar",
+    "limpar",
+    "parar",
+    "moverEsquerda",
+    "moverDireita",
+    "continuar"
+  ],
   watch: {
     limpar: function() {
       this.limparSelecoes();
     },
-    parar: function(retorno) {
-      this.pararJogada(retorno);
+    parar: function() {
+      this.pararJogada();
+    },
+    continuar: function() {
+      this.continuarJogada();
     },
     moverEsquerda: function() {
       this.mover("esquerda");
@@ -107,7 +118,8 @@ export default {
       casasPrenchidas: [],
       historico: [],
       tempo: 1000,
-      alertando: false,
+      alertandoAmarelo: false,
+      alertandoVermelho: false,
       jogandoVermelho: false,
       movendoPeca: false,
       gravandoPassos: {},
@@ -116,7 +128,8 @@ export default {
       timeout2: Number,
       timeout3: Number,
       timeout4: Number,
-      timeout5: Number
+      timeout5: Number,
+      count: Number
     };
   },
 
@@ -179,53 +192,51 @@ export default {
       this.casasPrenchidas = [];
       this.atualizarHistorico(null);
     },
-    pararJogada: function(valor) {
-      if (valor) {
-        this.movendoPeca = true;
-        clearTimeout(this.timeout);
-        clearTimeout(this.timeout1);
-        clearTimeout(this.timeout2);
-        clearTimeout(this.timeout3);
-        clearTimeout(this.timeout4);
-        clearTimeout(this.timeout5);
+    pararJogada: function() {
+      this.movendoPeca = true;
+      clearTimeout(this.timeout);
+      clearTimeout(this.timeout1);
+      clearTimeout(this.timeout2);
+      clearTimeout(this.timeout3);
+      clearTimeout(this.timeout4);
+      clearTimeout(this.timeout5);
 
-        this.$el.children[0].childNodes[this.gravandoPassos.linha].childNodes[
-          this.gravandoPassos.coluna
-        ].className = this.gravandoPassos.jogador;
+      this.$el.children[0].childNodes[this.gravandoPassos.linha].childNodes[
+        this.gravandoPassos.coluna
+      ].className = this.gravandoPassos.jogador;
 
-        var jogadorTipo =
-          this.gravandoPassos.jogador === "jogador-amarelo"
-            ? "Amarelo"
-            : "Vermelho";
-        var historico = "O jogador " + jogadorTipo + " parou a jogada!!";
-        this.historico.push({
-          historico: historico
-        });
-        this.atualizarHistorico({ historico: historico });
-      } else {
-        this.movendoPeca = false;
-        this.jogando = false;
-        this.jogar(this.gravandoPassos.coluna, this.gravandoPassos.jogador);
-      }
+      var jogadorTipo =
+        this.gravandoPassos.jogador === "jogador-amarelo"
+          ? "Amarelo"
+          : "Vermelho";
+      var historico = "O jogador " + jogadorTipo + " parou a jogada!!";
+      this.historico.push({
+        historico: historico
+      });
+      this.atualizarHistorico({ historico: historico });
+      this.jogando = false;
+    },
+    continuarJogada: function() {
+      this.movendoPeca = false;
+      this.jogando = false;
+      this.jogar(this.gravandoPassos.coluna, this.gravandoPassos.jogador);
     },
     jogar: function(coluna, jogador) {
-      let count = 1;
+      this.count = 1;
       this.jogandoVermelho = false;
+      this.jogando = false;
       if (jogador) {
-        this.jogarPeca(coluna, jogador, count);
+        this.jogarPeca(coluna, jogador);
       } else {
-        this.jogarPeca(coluna, "jogador-amarelo", count);
+        this.jogarPeca(coluna, "jogador-amarelo");
       }
     },
-    jogarPeca: function(coluna, jogador, count) {
+    jogarPeca: function(coluna, jogador) {
       const thisJogar = this;
-      if (
-        (!thisJogar.jogando || thisJogar.jogandoVermelho) &&
-        thisJogar.podeJogar
-      ) {
+      if ((!this.jogando || this.jogandoVermelho) && this.podeJogar) {
         thisJogar.jogando = true;
         thisJogar.timeout = setTimeout(function() {
-          thisJogar.setClass(0, coluna, jogador, count);
+          thisJogar.setClass(0, coluna, jogador);
           thisJogar.gravandoPassos = {
             linha: 0,
             coluna: coluna,
@@ -238,8 +249,8 @@ export default {
                 coluna: coluna,
                 jogador: jogador
               };
-              thisJogar.setClass(1, coluna, jogador, count);
-              thisJogar.setClass(0, coluna, "neutro", count);
+              thisJogar.setClass(1, coluna, jogador);
+              thisJogar.setClass(0, coluna, "neutro");
             }
             thisJogar.timeout2 = setTimeout(function() {
               if (!thisJogar.verificaSeEstaPreenchida(2, coluna, jogador)) {
@@ -248,19 +259,19 @@ export default {
                   coluna: coluna,
                   jogador: jogador
                 };
-                thisJogar.setClass(2, coluna, jogador, count);
-                thisJogar.setClass(1, coluna, "neutro", count);
+                thisJogar.setClass(2, coluna, jogador);
+                thisJogar.setClass(1, coluna, "neutro");
               }
               thisJogar.timeout3 = setTimeout(function() {
-                thisJogar.setClass(3, coluna, jogador, count);
+                thisJogar.setClass(3, coluna, jogador);
                 if (!thisJogar.verificaSeEstaPreenchida(3, coluna, jogador)) {
                   thisJogar.gravandoPassos = {
                     linha: 3,
                     coluna: coluna,
                     jogador: jogador
                   };
-                  thisJogar.setClass(3, coluna, jogador, count);
-                  thisJogar.setClass(2, coluna, "neutro", count);
+                  thisJogar.setClass(3, coluna, jogador);
+                  thisJogar.setClass(2, coluna, "neutro");
                 }
                 thisJogar.timeout4 = setTimeout(function() {
                   if (!thisJogar.verificaSeEstaPreenchida(4, coluna, jogador)) {
@@ -269,8 +280,8 @@ export default {
                       coluna: coluna,
                       jogador: jogador
                     };
-                    thisJogar.setClass(4, coluna, jogador, count);
-                    thisJogar.setClass(3, coluna, "neutro", count);
+                    thisJogar.setClass(4, coluna, jogador);
+                    thisJogar.setClass(3, coluna, "neutro");
                   }
                   thisJogar.timeout5 = setTimeout(function() {
                     if (
@@ -281,8 +292,8 @@ export default {
                         coluna: coluna,
                         jogador: jogador
                       };
-                      thisJogar.setClass(5, coluna, jogador, count);
-                      thisJogar.setClass(4, coluna, "neutro", count);
+                      thisJogar.setClass(5, coluna, jogador);
+                      thisJogar.setClass(4, coluna, "neutro");
                     }
                   }, 300);
                 }, 300);
@@ -292,14 +303,14 @@ export default {
         }, 300);
       }
     },
-    setClass: function(linha, coluna, nome, count) {
+    setClass: function(linha, coluna, nome) {
       const elemento = this.$el;
-      count++;
+      this.count++;
       elemento.children[0].childNodes[linha].childNodes[
         coluna
       ].className = nome;
 
-      if (count === 12) {
+      if (this.count === 12) {
         this.jogando = false;
       }
     },
@@ -327,9 +338,12 @@ export default {
         if (thisJogar.verificaQuatroSeguidas(linha, coluna, jogador)) {
           thisJogar.jogando = false;
           thisJogar.casasPrenchidas = [];
-          thisJogar.alertando = true;
+          thisJogar.alertandoAmarelo = jogador === "jogador-amarelo";
+          thisJogar.alertandoVermelho = jogador === "jogador-vermelho";
+          thisJogar.limparSelecoes();
           setTimeout(function() {
-            thisJogar.alertando = false;
+            thisJogar.alertandoAmarelo = false;
+            thisJogar.alertandoVermelho = false;
           }, 1000);
 
           var jogadorTipo1 =
@@ -355,9 +369,12 @@ export default {
           thisJogar.jogando = false;
           thisJogar.casasPrenchidas = [];
 
-          thisJogar.alertando = true;
+          thisJogar.alertandoAmarelo = jogador === "jogador-amarelo";
+          thisJogar.alertandoVermelho = jogador === "jogador-vermelho";
+          thisJogar.limparSelecoes();
           setTimeout(function() {
-            thisJogar.alertando = false;
+            thisJogar.alertandoAmarelo = false;
+            thisJogar.alertandoVermelho = false;
           }, 1000);
 
           var jogadorTipo =
